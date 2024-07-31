@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Summarizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        #upload-container {
+            text-align: center;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+        #upload-container h1 {
+            margin-bottom: 20px;
+        }
+        #upload-container input[type="file"] {
+            display: none;
+        }
+        #upload-container label {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #upload-container label:hover {
+            background-color: #0056b3;
+        }
+        #summary {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            text-align: left;
+            max-width: 500px;
+            margin: auto;
+        }
+        #question-container {
+            margin-top: 20px;
+        }
+        #question-container input[type="text"] {
+            padding: 10px;
+            width: calc(100% - 22px);
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        #question-container button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        #question-container button:hover {
+            background-color: #0056b3;
+        }
+        #response {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            text-align: left;
+            max-width: 500px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="upload-container">
+        <h1>Summarize PDF files with AI</h1>
+        <input type="file" id="file-input" accept="application/pdf">
+        <label for="file-input">Choose files</label>
+        <div id="summary"></div>
+    </div>
+
+    <div id="question-container">
+        <input type="text" id="question-input" placeholder="Ask a question...">
+        <button id="ask-button">Ask</button>
+        <div id="response"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let conversationHistory = [];
+
+            document.getElementById('file-input').addEventListener('change', async function () {
+                const file = this.files[0];
+                if (!file) return;
+
+                console.log('File selected:', file);
+
+                const formData = new FormData();
+                formData.append('file', file);
+
+                try {
+                    const response = await fetch('/summarize', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await response.json();
+                    console.log('Response from server:', data);
+
+                    if (data.error) {
+                        document.getElementById('summary').textContent = data.error;
+                    } else {
+                        document.getElementById('summary').textContent = data.summary;
+                    }
+                } catch (error) {
+                    console.error('Error during fetch:', error);
+                    document.getElementById('summary').textContent = 'An error occurred while summarizing the PDF.';
+                }
+            });
+
+            document.getElementById('ask-button').addEventListener('click', async function () {
+                const question = document.getElementById('question-input').value;
+                if (!question) return;
+
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question, history: conversationHistory })
+                });
+                const data = await response.json();
+
+                conversationHistory = data.history;  // Update history with the response
+
+                document.getElementById('response').textContent = data.answer;
+            });
+        });
+    </script>
+</body>
+</html>
