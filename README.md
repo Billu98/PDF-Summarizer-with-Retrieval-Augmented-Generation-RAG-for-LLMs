@@ -30,6 +30,11 @@ This project is a web application that leverages the power of Retrieval-Augmente
   
   ->  **Conda:** For managing the project's environment and dependencies.
 
+## Results
+
+![image](https://github.com/user-attachments/assets/44792dc0-198f-4b4e-89cb-5f2c449979b8)
+![image](https://github.com/user-attachments/assets/cfc602a0-5ee6-48c9-8505-bb69cac0710d)
+
 
 ## Retrieval-Augmented Generation (RAG)
 This project utilizes the concept of Retrieval-Augmented Generation (RAG) to enhance the accuracy and relevance of the generated summaries. RAG combines the power of retrieval (finding relevant documents) and generation (creating summaries) to provide more informed and context-aware summaries. The workflow is as follows:
